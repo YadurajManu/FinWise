@@ -63,9 +63,7 @@ struct AuthenticationView: View {
                     }
                     
                     // Forgot Password
-                    Button(action: {
-                        // Handle forgot password
-                    }) {
+                    NavigationLink(destination: ForgotPasswordView()) {
                         Text("Forgot Password?")
                             .font(
                                 Font.custom("League Spartan", size: 14)

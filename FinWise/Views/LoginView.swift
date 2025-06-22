@@ -117,9 +117,7 @@ struct LoginView: View {
                     .padding(.horizontal, 40)
                     
                     // Forgot Password
-                    Button(action: {
-                        // Handle forgot password
-                    }) {
+                    NavigationLink(destination: ForgotPasswordView()) {
                         Text("Forgot Password?")
                             .font(.leagueSpartan(size: 14, weight: .semibold))
                             .foregroundColor(Color(red: 0.04, green: 0.19, blue: 0.19))
