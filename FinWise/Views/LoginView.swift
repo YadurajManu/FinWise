@@ -11,6 +11,7 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var isPasswordVisible = false
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
     @EnvironmentObject var firebaseAuth: FirebaseAuthService
     var body: some View {
         ZStack {
@@ -90,8 +91,8 @@ struct LoginView: View {
                     .padding(.horizontal, 40)
                     
                     // Error Message
-                    if !firebaseAuth.errorMessage.isEmpty {
-                        Text(firebaseAuth.errorMessage)
+                    if !authViewModel.errorMessage.isEmpty {
+                        Text(authViewModel.errorMessage)
                             .font(.poppins(size: 14, weight: .regular))
                             .foregroundColor(.red)
                             .padding(.horizontal, 40)
@@ -99,9 +100,9 @@ struct LoginView: View {
                     
                     // Log In Button
                     Button(action: {
-                        firebaseAuth.signInWithEmail(email: email, password: password)
+                        authViewModel.signInWithEmail(email: email, password: password)
                                         }) {
-                        if firebaseAuth.isLoading {
+                        if authViewModel.isLoading {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle(tint: .black))
                         } else {
@@ -113,7 +114,7 @@ struct LoginView: View {
                     .frame(maxWidth: .infinity, minHeight: 45)
                     .background(Color.finWiseGreen)
                     .cornerRadius(22.5)
-                    .disabled(firebaseAuth.isLoading)
+                    .disabled(authViewModel.isLoading)
                     .padding(.horizontal, 40)
                     
                     // Forgot Password
@@ -132,20 +133,35 @@ struct LoginView: View {
                             .foregroundColor(.black)
                     }
                     
-                    // Fingerprint Section
-                    VStack(spacing: 8) {
-                        HStack {
-                            Text("Use ")
-                                .font(.poppins(size: 14, weight: .regular))
-                                .foregroundColor(.black)
-                            Text("Fingerprint")
-                                .font(.poppins(size: 14, weight: .regular))
-                                .foregroundColor(.blue)
-                            Text(" To Access")
-                                .font(.poppins(size: 14, weight: .regular))
-                                .foregroundColor(.black)
+                    // Biometric Section
+                    if authViewModel.isBiometricEnabled() {
+                        VStack(spacing: 8) {
+                            Button(action: {
+                                authViewModel.authenticateWithBiometrics { success in
+                                    if success {
+                                        // User authenticated successfully
+                                        print("Biometric authentication successful")
+                                    }
+                                }
+                            }) {
+                                HStack {
+                                    Text("Use ")
+                                        .font(.poppins(size: 14, weight: .regular))
+                                        .foregroundColor(.black)
+                                    Text(authViewModel.getBiometricType())
+                                        .font(.poppins(size: 14, weight: .regular))
+                                        .foregroundColor(.blue)
+                                    Text(" To Access")
+                                        .font(.poppins(size: 14, weight: .regular))
+                                        .foregroundColor(.black)
+                                }
+                            }
+                            
+                            Text("or sign up with")
+                                .font(.poppins(size: 12, weight: .regular))
+                                .foregroundColor(.gray)
                         }
-                        
+                    } else {
                         Text("or sign up with")
                             .font(.poppins(size: 12, weight: .regular))
                             .foregroundColor(.gray)
@@ -157,7 +173,7 @@ struct LoginView: View {
                         
                         // Google Button
                         Button(action: {
-                            firebaseAuth.signInWithGoogle()
+                            authViewModel.signInWithGoogle()
                         }) {
                             Image("Google")
                                 .resizable()
@@ -173,7 +189,7 @@ struct LoginView: View {
                             .font(.poppins(size: 14, weight: .regular))
                             .foregroundColor(.black)
                         
-                        NavigationLink(destination: SignUpView().environmentObject(firebaseAuth)) {
+                        NavigationLink(destination: SignUpView().environmentObject(firebaseAuth).environmentObject(authViewModel)) {
                             Text("Sign Up")
                                 .font(.poppins(size: 14, weight: .regular))
                                 .foregroundColor(.blue)
@@ -199,6 +215,10 @@ struct LoginView: View {
         .cornerRadius(60)
         .navigationBarHidden(true)
         .ignoresSafeArea()
+        .fullScreenCover(isPresented: $authViewModel.showBiometricSetup) {
+            BiometricSetupView()
+                .environmentObject(authViewModel)
+        }
     }
 }
 

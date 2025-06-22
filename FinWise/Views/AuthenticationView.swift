@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AuthenticationView: View {
     @EnvironmentObject var firebaseAuth: FirebaseAuthService
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
     
     var body: some View {
         ZStack {
@@ -39,7 +40,7 @@ struct AuthenticationView: View {
                 // Buttons Section
                 VStack(spacing: 20) {
                     // Log In Button
-                    NavigationLink(destination: LoginView().environmentObject(firebaseAuth)) {
+                    NavigationLink(destination: LoginView().environmentObject(firebaseAuth).environmentObject(authViewModel)) {
                         Text("Log In")
                             .font(.poppins(size: 18, weight: .semibold))
                             .foregroundColor(.black)
@@ -49,7 +50,7 @@ struct AuthenticationView: View {
                     }
                     
                     // Sign Up Button
-                    NavigationLink(destination: SignUpView().environmentObject(firebaseAuth)) {
+                    NavigationLink(destination: SignUpView().environmentObject(firebaseAuth).environmentObject(authViewModel)) {
                         Text("Sign Up")
                             .font(.poppins(size: 18, weight: .semibold))
                             .foregroundColor(.black)

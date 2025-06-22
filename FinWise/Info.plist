@@ -15,5 +15,7 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSFaceIDUsageDescription</key>
+	<string>FinWise uses Face ID or Touch ID to provide secure and convenient access to your financial data.</string>
 </dict>
 </plist>
